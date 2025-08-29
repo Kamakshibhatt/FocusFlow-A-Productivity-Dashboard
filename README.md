@@ -24,15 +24,3 @@ Built with **React + Tailwind CSS**, this project demonstrates practical fronten
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (>= 14)  
-- npm or yarn  
-
-### Installation
-```bash
-
-
-# Start development server
-npm start
