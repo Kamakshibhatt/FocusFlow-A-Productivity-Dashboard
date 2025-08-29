@@ -1,0 +1,137 @@
+import React, { useState, useEffect } from "react";
+
+// Simple task manager component
+const Tasks = () => {
+  const [taskInput, setTaskInput] = useState("");
+  const [taskList, setTaskList] = useState([]);
+
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    setTaskList(savedTasks);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+  }, [taskList]);
+
+  const addTask = () => {
+    if (taskInput.trim() !== "") {
+      setTaskList([...taskList, { text: taskInput, done: false }]);
+      setTaskInput("");
+    }
+  };
+
+  const toggleTask = (index) => {
+    const updated = [...taskList];
+    updated[index].done = !updated[index].done;
+    setTaskList(updated);
+  };
+
+  return (
+    <div className="p-4 shadow-md rounded-xl bg-white">
+      <h2 className="text-xl font-semibold mb-2">Tasks</h2>
+      <div className="flex mb-3">
+        <input
+          value={taskInput}
+          onChange={(e) => setTaskInput(e.target.value)}
+          placeholder="Enter task"
+          className="border p-2 rounded flex-1"
+        />
+        <button
+          onClick={addTask}
+          className="ml-2 px-3 py-1 bg-blue-500 text-white rounded"
+        >
+          Add
+        </button>
+      </div>
+      <ul>
+        {taskList.map((task, idx) => (
+          <li
+            key={idx}
+            onClick={() => toggleTask(idx)}
+            className={`cursor-pointer ${task.done ? "line-through text-gray-500" : ""}`}
+          >
+            {task.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// Simple Pomodoro Timer component
+const Pomodoro = () => {
+  const [secondsLeft, setSecondsLeft] = useState(1500); // 25 min default
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (running && secondsLeft > 0) {
+      timer = setInterval(() => setSecondsLeft((t) => t - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [running, secondsLeft]);
+
+  const formatTime = (s) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec < 10 ? "0" : ""}${sec}`;
+  };
+
+  return (
+    <div className="p-4 shadow-md rounded-xl bg-white">
+      <h2 className="text-xl font-semibold mb-2">Pomodoro Timer</h2>
+      <p className="text-2xl mb-3">{formatTime(secondsLeft)}</p>
+      <div>
+        <button
+          onClick={() => setRunning(!running)}
+          className="px-3 py-1 bg-green-500 text-white rounded mr-2"
+        >
+          {running ? "Pause" : "Start"}
+        </button>
+        <button
+          onClick={() => setSecondsLeft(1500)}
+          className="px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Simple notes component
+const Notes = () => {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("notes") || "";
+    setText(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("notes", text);
+  }, [text]);
+
+  return (
+    <div className="p-4 shadow-md rounded-xl bg-white">
+      <h2 className="text-xl font-semibold mb-2">Notes</h2>
+      <textarea
+        className="w-full h-32 border p-2 rounded"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      ></textarea>
+    </div>
+  );
+};
+
+// Dashboard layout
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 grid md:grid-cols-3 gap-6">
+      <Tasks />
+      <Pomodoro />
+      <Notes />
+    </div>
+  );
+}
